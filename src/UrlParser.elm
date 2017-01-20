@@ -1,5 +1,5 @@
 module UrlParser exposing
-  ( Parser, string, int, s
+  ( Parser, string, int, s, remainingSegments
   , (</>), map, oneOf, top, custom
   , QueryParser, (<?>), stringParam, intParam, customParam
   , parsePath, parseHash
@@ -8,7 +8,7 @@ module UrlParser exposing
 {-|
 
 # Primitives
-@docs Parser, string, int, s
+@docs Parser, string, int, s, remainingSegments
 
 # Path Parses
 @docs (</>), map, oneOf, top, custom
@@ -126,6 +126,15 @@ custom tipe stringToSomething =
           Err msg ->
             []
 
+
+{-| Parse the remaining segments as strings:
+
+    s "foo" </> remainingSegments -- parses /foo and /foo/bar/baz
+-}
+remainingSegments : Parser (List String -> a) a
+remainingSegments =
+    Parser <| \{ visited, unvisited, params, value } ->
+        [ State ((List.reverse unvisited) ++ visited) [] params (value unvisited) ]
 
 
 -- COMBINING PARSERS
@@ -245,7 +254,6 @@ oneOf parsers =
 top : Parser a a
 top =
   Parser <| \state -> [state]
-
 
 
 -- QUERY PARAMETERS

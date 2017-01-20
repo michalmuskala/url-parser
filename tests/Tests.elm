@@ -24,6 +24,7 @@ testParsing =
     , parserTest "Users" "users" (UsersRoutes UsersRoute)
     , parserTest "User" "users/2" (UsersRoutes (UserRoute 2))
     , parserTest "Edit" "users/2/edit" (UsersRoutes (UserEditRoute 2))
+    , parserTest "Rest" "rest/foo/bar/baz" (RestRoute ["foo", "bar", "baz"])
     ]
 
 
@@ -66,6 +67,7 @@ type MainRoute
     | AboutRoute
     | TokenRoute String
     | UsersRoutes UserRoute
+    | RestRoute (List String)
     | NotFoundRoute
 
 
@@ -89,6 +91,7 @@ mainMatchers =
     , map AboutRoute (s "about")
     , map TokenRoute (s "token" </> string)
     , map UsersRoutes (s "users" </> (oneOf usersMatchers))
+    , map RestRoute (s "rest" </> remainingSegments)
     ]
 
 
